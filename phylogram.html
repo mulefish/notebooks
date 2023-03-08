@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Hat Phylogeny</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+</head>
+<body>
+  <script>
+    // Load the JSON data
+    d3.json('hat_phylogeny.json').then(function(data) {
+
+      // Define the dimensions of the SVG
+      const width = 600;
+      const height = 400;
+
+      // Create the SVG element
+      const svg = d3.select('body').append('svg')
+        .attr('width', width)
+        .attr('height', height);
+
+      // Define the tree layout
+      const treeLayout = d3.tree()
+        .size([width - 100, height - 100]);
+
+      // Define the root node
+      const rootNode = d3.hierarchy(data);
+
+      // Compute the tree layout
+      treeLayout(rootNode);
+
+      // Define the links
+      const links = rootNode.links();
+
+      // Draw the links
+      svg.selectAll('.link')
+        .data(links)
+        .enter().append('path')
+        .attr('class', 'link')
+        .attr('d', d3.linkHorizontal()
+          .x(d => d.y)
+          .y(d => d.x));
+
+      // Define the nodes
+      const nodes = rootNode.descendants();
+
+      // Draw the nodes
+      const node = svg.selectAll('.node')
+        .data(nodes)
+        .enter().append('g')
+        .attr('class', 'node')
+        .attr('transform', d => `translate(${d.y},${d.x})`);
+
+      // Draw the circles
+      node.append('circle')
+        .attr('r', 5);
+
+      // Draw the labels
+      node.append('text')
+        .attr('x', 8)
+        .attr('y', 3)
+        .text(d => d.data.name);
+    });
+  </script>
+</body>
+</html>
+
